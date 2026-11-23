@@ -43,10 +43,11 @@ let cached: Db | undefined;
 export function getDb(): Db {
   if (cached) return cached;
   const location = resolveDbLocation(process.env, process.cwd());
-  if (location.copyFrom && !fs.existsSync(location.file)) {
-    fs.copyFileSync(location.copyFrom, location.file);
+  // The path is intentionally dynamic: the bundled DB is traced via outputFileTracingIncludes,
+  // so stop the bundler from tracing the whole project because of these calls.
+  if (location.copyFrom && !fs.existsSync(/*turbopackIgnore: true*/ location.file)) {
+    fs.copyFileSync(/*turbopackIgnore: true*/ location.copyFrom, location.file);
   }
-  fs.mkdirSync(path.dirname(location.file), { recursive: true });
   cached = openDatabase(location.file);
   return cached;
 }
