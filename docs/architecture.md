@@ -24,7 +24,7 @@ flowchart LR
 - **repository**: all SQL. Receives a `Database` handle, so tests pass `:memory:`.
 - **service**: use cases (list, create, update, delete, insights), maps DB constraint errors to domain errors (`NotFoundError`, `ConflictError`, `ValidationError`).
 - **route handlers**: only translate HTTP <-> service calls. Error shape is always `{ error: { code, message, details? } }`.
-- **UI**: client components fetch the JSON API (TanStack-free, plain `fetch` with small hooks); server-side pagination and filtering.
+- **UI**: client components fetch the JSON API with plain `fetch` and one small `useApi` hook; server-side pagination and filtering.
 
 ## Data model
 ```mermaid
