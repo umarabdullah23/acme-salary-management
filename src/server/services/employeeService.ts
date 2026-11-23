@@ -1,9 +1,10 @@
 import type { Db } from "../db/connection";
 import { formatEmployeeCode } from "../domain/employeeCode";
-import { employeeInputSchema, type EmployeeInput } from "../domain/employeeSchema";
+import { employeeInputSchema, listQuerySchema, type EmployeeInput } from "../domain/employeeSchema";
 import { conflictError, notFoundError, validationError } from "../domain/errors";
 import { currencyForCountry, toUsd } from "../domain/fx";
-import type { Employee } from "../domain/types";
+import type { Employee, Page } from "../domain/types";
+import { listEmployees, loadMeta, type EmployeeMeta } from "../repository/employeeQuery";
 import { EmployeeRepository, type EmployeeChanges } from "../repository/employeeRepository";
 
 export class EmployeeService {
@@ -26,6 +27,19 @@ export class EmployeeService {
         ),
       )(),
     );
+  }
+
+  list(raw: unknown): Page<Employee> {
+    const parsed = listQuerySchema.safeParse(raw);
+    if (!parsed.success) {
+      const details = parsed.error.issues.map((i) => ({ field: i.path.join("."), message: i.message }));
+      throw validationError("Invalid query parameters", details);
+    }
+    return listEmployees(this.db, parsed.data);
+  }
+
+  meta(): EmployeeMeta {
+    return loadMeta(this.db);
   }
 
   get(id: number): Employee {
