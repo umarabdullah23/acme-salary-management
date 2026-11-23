@@ -14,6 +14,7 @@ export default defineConfig({
       include: ["src/server/**/*.ts"],
       exclude: ["src/server/**/*.d.ts"],
       reporter: ["text-summary", "text"],
+      thresholds: { lines: 85 },
     },
   },
 });
