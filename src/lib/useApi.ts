@@ -9,25 +9,39 @@ export interface ApiState<T> {
   loading: boolean;
 }
 
-/** Fetches `url` (skipped when null) and ignores stale responses when the url changes. */
+interface Settled<T> {
+  key: string;
+  data: T | undefined;
+  error: string | undefined;
+}
+
+/**
+ * Fetches `url` (skipped when null). Keeps the previous data while reloading and ignores
+ * stale responses. `loading` is derived: the latest request key has not settled yet.
+ */
 export function useApi<T>(url: string | null, reloadKey = 0): ApiState<T> {
-  const [state, setState] = useState<ApiState<T>>({ data: undefined, error: undefined, loading: url !== null });
+  const key = `${reloadKey}:${url}`;
+  const [settled, setSettled] = useState<Settled<T>>({ key: "", data: undefined, error: undefined });
 
   useEffect(() => {
     if (url === null) return;
     let stale = false;
-    setState((s) => ({ ...s, loading: true, error: undefined }));
     request<T>(url)
-      .then((data) => !stale && setState({ data, error: undefined, loading: false }))
+      .then((data) => !stale && setSettled({ key, data, error: undefined }))
       .catch(
         (e: unknown) =>
           !stale &&
-          setState({ data: undefined, error: e instanceof Error ? e.message : "Request failed", loading: false }),
+          setSettled((s) => ({ key, data: s.data, error: e instanceof Error ? e.message : "Request failed" })),
       );
     return () => {
       stale = true;
     };
-  }, [url, reloadKey]);
+  }, [url, key]);
 
-  return state;
+  const current = settled.key === key;
+  return {
+    data: settled.data,
+    error: current ? settled.error : undefined,
+    loading: url !== null && !current,
+  };
 }
