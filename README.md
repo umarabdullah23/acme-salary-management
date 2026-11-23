@@ -2,8 +2,8 @@
 
 A web app for ACME's HR manager to manage salary data for 10,000 employees across 8 countries and answer "how do we pay people?" without spreadsheets.
 
-- **Live app:** <!-- LIVE_URL -->
-- **Demo video:** <!-- DEMO_VIDEO -->
+- **Live app:** **Live app:** https://incubyte-salary-management-beta.vercel.app (Vercel; demo data resets on cold start, see `docs/decisions.md`)
+- **Demo video:** **Demo video:** [docs/demo/demo.mp4](docs/demo/demo.mp4) (2 min walkthrough: search, filters, create/edit/delete, insights)
 
 ## Features
 - **Employees:** server-side paginated directory (25/page) with search (name, email, code), filters (country, department, job title, type) and sort (name, salary, hire date). Create, edit and delete with validation and a delete confirmation.
